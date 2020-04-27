@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block content %}
+<br>
+{% for item in threads %}
+<div class="thread">
+    <a href="thread/{{item.id}}">{{ item.title }}</a>
+</div>
+<br>
+{% endfor %}
+    {% if current_user.is_authenticated %}
+        <a href="add_thread" class="btn btn-secondary form">Создать трэд</a>
+    {% endif %}
+{% endblock %}
