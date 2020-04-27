@@ -1,13 +1,13 @@
 {% extends "base.html" %}
 {% block content %}
-<h1 class="form">Создание Треда</h1>
+<h1 class="form">Оставить комментарий</h1>
 <form class="form" action="" method="post">
     {{ form.hidden_tag() }}
     {{ form.csrf_token }}
     <p>
-        {{ form.title.label }}<br>
-        {{ form.title(class="form-control") }}<br>
-        {% for error in form.title.errors %}
+        Текст комментария:<br>
+        {{ form.text(class="form-control") }}<br>
+        {% for error in form.text.errors %}
             <p class="alert alert-danger" role="alert">
                 {{ error }}
             </p>

@@ -4,9 +4,12 @@ from werkzeug.utils import redirect
 from LoginForm import LoginForm
 from RegisterForm import RegisterForm
 from ThreadForm import ThreadForm
+from CommentForm import CommentForm
+from AnswerForm import AnswerForm
 from data import db_session
-from data.threads import Thread
 from data.users import User
+from data.threads import Thread
+from data.comments import Comment
 
 app = Flask(__name__)
 login_manager = LoginManager()
@@ -85,14 +88,34 @@ def add_thread():
         session.add(thread)
         session.commit()
         return redirect('/')
-    return render_template('adding new thread.html', title='Создание трэда',
+    return render_template('adding new thread.html', title='Создание треда',
                            form=form)
 
 
 @app.route('/thread/<tid>')
 def indexed_thread(tid):
     session = db_session.create_session()
-    return render_template('indexed_thread.html', thread=session.query(Thread).filter(Thread.id==tid).first())
+    return render_template('indexed_thread.html',
+                           thread=session.query(Thread).filter(Thread.id == tid).first())
+
+
+@app.route('/add_comment/<tid>', methods=['GET', 'POST'])
+@login_required
+def add_comment(tid):
+    form = CommentForm()
+    if form.validate_on_submit():
+        session = db_session.create_session()
+        comment = Comment()
+        comment.text = form.text.data
+        comment.user_id = current_user.id
+        comment.thread_id = tid
+        session.add(comment)
+        session.commit()
+        return redirect(f'/thread/{tid}')
+    return render_template('add_comment.html', title='Оставить комментарий', form=form)
+
+
+# def
 
 
 def main():
