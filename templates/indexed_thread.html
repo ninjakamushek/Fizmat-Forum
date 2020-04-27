@@ -1,6 +1,12 @@
 {% extends "base.html" %}
 {% block content %}
 <br>
-<div class="form"><h4 align="center">{{ thread.title }}</h4></div>
-
+<div class="form"><a href="/add_comment/{{thread.id}}"><h2 align="center">{{ thread.title }}</h2></a></div>
+<p align="center">нажмите чтобы оставить комментарий</p>
+<hr/>
+{% for comm in comments %}
+<div class="comment">
+    <p>{{ comm.user.name }} {{ comm.user.surname }}: "{{ comm.text }}"</p>
+</div>
+{% endfor %}
 {% endblock %}

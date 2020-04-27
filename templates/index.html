@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
 <br>
-{% for item in threads %}
+{% for item in threads|reverse %}
 <div class="thread">
     <a href="thread/{{item.id}}">{{ item.title }}</a>
 </div>

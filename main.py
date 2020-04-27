@@ -96,7 +96,8 @@ def add_thread():
 def indexed_thread(tid):
     session = db_session.create_session()
     return render_template('indexed_thread.html',
-                           thread=session.query(Thread).filter(Thread.id == tid).first())
+                           thread=session.query(Thread).filter(Thread.id == tid).first(),
+                           comments=session.query(Comment).filter(Comment.thread_id==tid).all())
 
 
 @app.route('/add_comment/<tid>', methods=['GET', 'POST'])
