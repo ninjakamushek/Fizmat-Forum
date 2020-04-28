@@ -1,15 +1,17 @@
 from flask import Flask, render_template
 from flask_login import login_user, LoginManager, login_required, logout_user, current_user
 from werkzeug.utils import redirect
+
+from AnswerForm import AnswerForm
+from CommentForm import CommentForm
 from LoginForm import LoginForm
 from RegisterForm import RegisterForm
 from ThreadForm import ThreadForm
-from CommentForm import CommentForm
-from AnswerForm import AnswerForm
 from data import db_session
-from data.users import User
-from data.threads import Thread
+from data.answers import Answer
 from data.comments import Comment
+from data.threads import Thread
+from data.users import User
 
 app = Flask(__name__)
 login_manager = LoginManager()
@@ -116,12 +118,33 @@ def add_comment(tid):
     return render_template('add_comment.html', title='Оставить комментарий', form=form)
 
 
-# def
+@app.route('/add_answer/<cid>', methods=['GET', 'POST'])
+@login_required
+def add_answer(cid):
+    form = AnswerForm()
+    if form.validate_on_submit():
+        session = db_session.create_session()
+        answer = Answer()
+        answer.text = form.text.data
+        answer.user_id = current_user.id
+        answer.comm_id = cid
+        session.add(answer)
+        session.commit()
+        return redirect(f'/answers/{answer.comm_id}')
+    return render_template('add_answer.html', title='Ответить на комментарий', form=form)
+
+
+@app.route('/answers/<cid>')
+def answers(cid):
+    session = db_session.create_session()
+    return render_template('answers.html',
+                           comment=session.query(Comment).filter(Comment.id == cid).first(),
+                           answers=session.query(Answer).filter(Answer.comm_id == cid).all())
 
 
 def main():
     db_session.global_init("db/FF.sqlite")
-    app.run()
+    app.run(host="127.0.0.1", port="5000")
 
 
 if __name__ == '__main__':

@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="comment">
+    <p>{{ comment.user.name }} {{ comment.user.surname }}: "{{ comment.text }}"</p>
+    <a href="/add_answer/{{comment.id}}">Ответить</a>
+</div>
+<hr/>
+{% for ans in answers %}
+<div class="comment">
+    <p>{{ ans.user.name }} {{ ans.user.surname }}: "{{ ans.text }}"</p>
+</div>
+{% endfor %}
+{% endblock %}

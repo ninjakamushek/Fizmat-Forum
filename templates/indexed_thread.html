@@ -7,6 +7,7 @@
 {% for comm in comments %}
 <div class="comment">
     <p>{{ comm.user.name }} {{ comm.user.surname }}: "{{ comm.text }}"</p>
+    <a href="/answers/{{comm.id}}">Посмотреть ответы</a>
 </div>
 {% endfor %}
 {% endblock %}
