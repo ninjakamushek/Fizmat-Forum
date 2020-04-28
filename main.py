@@ -13,8 +13,6 @@ from data.answers import Answer
 from data.comments import Comment
 from data.threads import Thread
 from data.users import User
-from data.threads import Thread
-from data.comments import Comment
 
 app = Flask(__name__)
 login_manager = LoginManager()
@@ -81,7 +79,7 @@ def logout():
     return redirect("/")
 
 
-@app.route('/add_thread',  methods=['GET', 'POST'])
+@app.route('/add_thread', methods=['GET', 'POST'])
 @login_required
 def add_thread():
     form = ThreadForm()
@@ -102,7 +100,7 @@ def indexed_thread(tid):
     session = db_session.create_session()
     return render_template('indexed_thread.html',
                            thread=session.query(Thread).filter(Thread.id == tid).first(),
-                           comments=session.query(Comment).filter(Comment.thread_id==tid).all())
+                           comments=session.query(Comment).filter(Comment.thread_id == tid).all())
 
 
 @app.route('/thread_delete/<int:id>', methods=['GET', 'POST'])
@@ -110,7 +108,7 @@ def indexed_thread(tid):
 def thread_delete(id):
     session = db_session.create_session()
     thread = session.query(Thread).filter(Thread.id == id,
-                                      Thread.user == current_user).first()
+                                          Thread.user == current_user).first()
     if thread:
         session.delete(thread)
         session.commit()
@@ -142,7 +140,7 @@ def comment_edit(id):
     if request.method == "GET":
         session = db_session.create_session()
         comment = session.query(Comment).filter(Comment.id == id,
-                                          Comment.user == current_user).first()
+                                                Comment.user == current_user).first()
         if comment:
             form.text.data = comment.text
         else:
@@ -150,7 +148,7 @@ def comment_edit(id):
     if form.validate_on_submit():
         session = db_session.create_session()
         comment = session.query(Comment).filter(Comment.id == id,
-                                          Comment.user == current_user).first()
+                                                Comment.user == current_user).first()
         if comment:
             comment.text = form.text.data
             session.commit()
@@ -165,13 +163,15 @@ def comment_edit(id):
 def comment_delete(id):
     session = db_session.create_session()
     comment = session.query(Comment).filter(Comment.id == id,
-                                      Comment.user == current_user).first()
+                                            Comment.user == current_user).first()
     if comment:
         session.delete(comment)
         session.commit()
     else:
         abort(404)
     return redirect('/')
+
+
 @app.route('/add_answer/<cid>', methods=['GET', 'POST'])
 @login_required
 def add_answer(cid):
