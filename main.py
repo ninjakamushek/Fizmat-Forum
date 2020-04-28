@@ -107,8 +107,7 @@ def indexed_thread(tid):
 @login_required
 def thread_delete(id):
     session = db_session.create_session()
-    thread = session.query(Thread).filter(Thread.id == id,
-                                          Thread.user == current_user).first()
+    thread = session.query(Thread).filter(Thread.id == id, Thread.user == current_user).first()
     if thread:
         session.delete(thread)
         session.commit()
