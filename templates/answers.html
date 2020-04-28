@@ -2,7 +2,7 @@
 {% block content %}
 <div class="comment">
     <p>{{ comment.user.name }} {{ comment.user.surname }}: "{{ comment.text }}"</p>
-    <a href="/add_answer/{{comment.id}}">Ответить</a>
+    <a href="/add_answer/{{comment.id}}" class="btn btn-info">Ответить</a>
 </div>
 <hr/>
 {% for ans in answers %}
