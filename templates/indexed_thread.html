@@ -7,6 +7,10 @@
 {% for comm in comments %}
 <div class="comment">
     <p>{{ comm.user.name }} {{ comm.user.surname }}: "{{ comm.text }}"</p>
+    {% if current_user.is_authenticated and current_user == comm.user %}
+        <a href="/comment_edit/{{ comm.id }}" class="btn btn-warning">Изменить</a>
+        <a href="/comment_delete/{{ comm.id }}" class="btn btn-danger">Удалить</a>
+    {% endif %}
     <a href="/answers/{{comm.id}}">Посмотреть ответы</a>
 </div>
 {% endfor %}

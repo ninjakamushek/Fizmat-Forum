@@ -4,6 +4,9 @@
 {% for item in threads|reverse %}
 <div class="thread">
     <a href="thread/{{item.id}}">{{ item.title }}</a>
+    {% if current_user.is_authenticated and current_user == item.user %}
+            <a href="/thread_delete/{{ item.id }}" class="btn btn-danger">Удалить</a>
+    {% endif %}
 </div>
 <br>
 {% endfor %}
