@@ -1,5 +1,6 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 from flask_login import login_user, LoginManager, login_required, logout_user, current_user
+from werkzeug.exceptions import abort
 from werkzeug.utils import redirect
 from LoginForm import LoginForm
 from RegisterForm import RegisterForm
@@ -100,6 +101,20 @@ def indexed_thread(tid):
                            comments=session.query(Comment).filter(Comment.thread_id==tid).all())
 
 
+@app.route('/thread_delete/<int:id>', methods=['GET', 'POST'])
+@login_required
+def thread_delete(id):
+    session = db_session.create_session()
+    thread = session.query(Thread).filter(Thread.id == id,
+                                      Thread.user == current_user).first()
+    if thread:
+        session.delete(thread)
+        session.commit()
+    else:
+        abort(404)
+    return redirect('/')
+
+
 @app.route('/add_comment/<tid>', methods=['GET', 'POST'])
 @login_required
 def add_comment(tid):
@@ -116,7 +131,43 @@ def add_comment(tid):
     return render_template('add_comment.html', title='Оставить комментарий', form=form)
 
 
-# def
+@app.route('/comment_edit/<int:id>', methods=['GET', 'POST'])
+@login_required
+def comment_edit(id):
+    form = CommentForm()
+    if request.method == "GET":
+        session = db_session.create_session()
+        comment = session.query(Comment).filter(Comment.id == id,
+                                          Comment.user == current_user).first()
+        if comment:
+            form.text.data = comment.text
+        else:
+            abort(404)
+    if form.validate_on_submit():
+        session = db_session.create_session()
+        comment = session.query(Comment).filter(Comment.id == id,
+                                          Comment.user == current_user).first()
+        if comment:
+            comment.text = form.text.data
+            session.commit()
+            return redirect(f'/thread/{comment.thread_id}')
+        else:
+            abort(404)
+    return render_template('add_comment.html', title='Редактирование комментария', form=form)
+
+
+@app.route('/comment_delete/<int:id>', methods=['GET', 'POST'])
+@login_required
+def comment_delete(id):
+    session = db_session.create_session()
+    comment = session.query(Comment).filter(Comment.id == id,
+                                      Comment.user == current_user).first()
+    if comment:
+        session.delete(comment)
+        session.commit()
+    else:
+        abort(404)
+    return redirect('/')
 
 
 def main():
