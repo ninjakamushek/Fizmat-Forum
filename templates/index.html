@@ -4,8 +4,12 @@
 {% for item in threads|reverse %}
 <div class="thread">
     <a href="/thread/{{item.id}}">{{ item.title }}</a>
+    <p>нравится {{ item.like_count }} комментариев {{ item.comment_count }} просмотров {{ item.view_count }}</p>
     {% if current_user.is_authenticated and current_user == item.user %}
             <a href="/thread_delete/{{ item.id }}" class="btn btn-danger">Удалить</a>
+    {% endif %}
+    {% if current_user.is_authenticated %}
+        <a href="/like_thread/{{ item.id }}"><img src="static\img\like.png" height="20px" width="20px" align="right"></a>
     {% endif %}
 </div>
 <br>

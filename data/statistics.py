@@ -6,13 +6,13 @@ from sqlalchemy_serializer import SerializerMixin
 from .db_session import SqlAlchemyBase
 
 
-class Thread(SqlAlchemyBase, UserMixin, SerializerMixin):
-    __tablename__ = 'threads'
+class Action(SqlAlchemyBase, UserMixin, SerializerMixin):
+    __tablename__ = 'statistics'
 
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
-    title = sqlalchemy.Column(sqlalchemy.String, nullable=False)
     user_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("users.id"))
-    like_count = sqlalchemy.Column(sqlalchemy.Integer, nullable=False)
-    view_count = sqlalchemy.Column(sqlalchemy.Integer, nullable=False)
-    comment_count = sqlalchemy.Column(sqlalchemy.Integer, nullable=False)
+    thread_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("threads.id"))
+    liked = sqlalchemy.Column(sqlalchemy.Boolean)
+    viewed = sqlalchemy.Column(sqlalchemy.Boolean)
     user = orm.relation('User')
+    thread = orm.relation('Thread')

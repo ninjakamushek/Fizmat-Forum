@@ -2,7 +2,6 @@ from flask import Flask, render_template, request
 from flask_login import login_user, LoginManager, login_required, logout_user, current_user
 from werkzeug.exceptions import abort
 from werkzeug.utils import redirect
-
 from AnswerForm import AnswerForm
 from CommentForm import CommentForm
 from LoginForm import LoginForm
@@ -11,6 +10,7 @@ from ThreadForm import ThreadForm
 from data import db_session
 from data.answers import Answer
 from data.comments import Comment
+from data.statistics import Action
 from data.threads import Thread
 from data.users import User
 
@@ -88,6 +88,9 @@ def add_thread():
         thread = Thread()
         thread.title = form.title.data
         thread.user_id = current_user.id
+        thread.like_count = 0
+        thread.view_count = 0
+        thread.comment_count = 0
         session.add(thread)
         session.commit()
         return redirect('/')
@@ -98,6 +101,17 @@ def add_thread():
 @app.route('/thread/<tid>')
 def indexed_thread(tid):
     session = db_session.create_session()
+    thread = session.query(Thread).filter(Thread.id == tid).first()
+    if thread:
+        act = session.query(Action).filter(Action.user_id == current_user.id, Action.thread_id == tid, Action.viewed == True).first()
+        if not act:
+            action = Action()
+            action.user_id = current_user.id
+            action.thread_id = tid
+            action.viewed = True
+            thread.view_count = 1 + session.query(Thread).filter(Thread.id == tid).first().view_count
+            session.add(action)
+            session.commit()
     return render_template('indexed_thread.html',
                            thread=session.query(Thread).filter(Thread.id == tid).first(),
                            comments=session.query(Comment).filter(Comment.thread_id == tid).all())
@@ -113,6 +127,24 @@ def thread_delete(id):
         session.commit()
     else:
         abort(404)
+    return redirect('/')
+
+
+@app.route('/like_thread/<int:id>', methods=['GET', 'POST'])
+@login_required
+def like_thread(id):
+    session = db_session.create_session()
+    thread = session.query(Thread).filter(Thread.id == id).first()
+    if thread:
+        act = session.query(Action).filter(Action.user_id == current_user.id, Action.thread_id == id, Action.liked == True).first()
+        if not act:
+            action = Action()
+            action.user_id = current_user.id
+            action.thread_id = id
+            action.liked = True
+            thread.like_count = 1 + session.query(Thread).filter(Thread.id == id).first().like_count
+            session.add(action)
+            session.commit()
     return redirect('/')
 
 
