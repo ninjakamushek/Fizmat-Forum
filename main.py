@@ -158,6 +158,8 @@ def add_comment(tid):
         comment.text = form.text.data
         comment.user_id = current_user.id
         comment.thread_id = tid
+        thread = session.query(Thread).filter(Thread.id == tid).first()
+        thread.comment_count = 1 + session.query(Thread).filter(Thread.id == tid).first().comment_count
         session.add(comment)
         session.commit()
         return redirect(f'/thread/{tid}')
@@ -197,10 +199,12 @@ def comment_delete(id):
                                             Comment.user == current_user).first()
     if comment:
         session.delete(comment)
+        thread = session.query(Thread).filter(Thread.id == comment.thread_id).first()
+        thread.comment_count = session.query(Thread).filter(Thread.id == comment.thread_id).first().comment_count - 1
         session.commit()
     else:
         abort(404)
-    return redirect('/')
+    return redirect(f'/thread/{comment.thread_id}')
 
 
 @app.route('/add_answer/<cid>', methods=['GET', 'POST'])
