@@ -32,6 +32,17 @@ def index():
     return render_template('index.html', threads=session.query(Thread).all())
 
 
+@app.route('/sort/<sort_type>')
+def sorted_index(sort_type):
+    session = db_session.create_session()
+    if sort_type == 'time':
+        return render_template('index.html', threads=session.query(Thread).all())
+    elif sort_type == 'like':
+        return render_template('index.html', threads=sorted(session.query(Thread).all(), key=lambda x: x.like_count))
+    elif sort_type == 'view':
+        return render_template('index.html', threads=sorted(session.query(Thread).all(), key=lambda x: x.view_count))
+
+
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     form = RegisterForm()

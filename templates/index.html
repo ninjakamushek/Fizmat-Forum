@@ -1,4 +1,9 @@
 {% extends "base.html" %}
+{% block select%}
+<a href="/sort/time">Сортировать по новизне</a>
+<a href="/sort/like">Сортировать по количеству лайков</a>
+<a href="/sort/view">Сортировать по количеству просмотров</a>
+{% endblock %}
 {% block content %}
 <br/><br/>
 {% for item in threads|reverse %}
