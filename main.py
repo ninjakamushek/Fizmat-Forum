@@ -31,15 +31,14 @@ def index():
     session = db_session.create_session()
     return render_template('index.html', threads=session.query(Thread).all())
 
-
-@app.route('/sort/<sort_type>')
-def sorted_index(sort_type):
+@app.route('/sorted')
+def sorted_index():
     session = db_session.create_session()
-    if sort_type == 'time':
+    if request.args.get('sort_type') == 'time':
         return render_template('index.html', threads=session.query(Thread).all())
-    elif sort_type == 'like':
+    elif request.args.get('sort_type') == 'like':
         return render_template('index.html', threads=sorted(session.query(Thread).all(), key=lambda x: x.like_count))
-    elif sort_type == 'view':
+    elif request.args.get('sort_type') == 'view':
         return render_template('index.html', threads=sorted(session.query(Thread).all(), key=lambda x: x.view_count))
 
 
@@ -114,8 +113,13 @@ def indexed_thread(tid):
     session = db_session.create_session()
     thread = session.query(Thread).filter(Thread.id == tid).first()
     if thread:
-        act = session.query(Action).filter(Action.user_id == current_user.id, Action.thread_id == tid, Action.viewed == True).first()
-        if not act:
+        act = session.query(Action).filter(Action.user_id == current_user.id, Action.thread_id == tid).first()
+        if act:
+            if act.viewed is None:
+                act.viewed = True
+                thread.view_count = 1 + session.query(Thread).filter(Thread.id == tid).first().view_count
+                session.commit()
+        else:
             action = Action()
             action.user_id = current_user.id
             action.thread_id = tid
@@ -135,6 +139,8 @@ def thread_delete(id):
     thread = session.query(Thread).filter(Thread.id == id, Thread.user == current_user).first()
     if thread:
         session.delete(thread)
+        for act in session.query(Action).filter(Action.thread_id == id):
+            session.delete(act)
         session.commit()
     else:
         abort(404)
@@ -147,8 +153,13 @@ def like_thread(id):
     session = db_session.create_session()
     thread = session.query(Thread).filter(Thread.id == id).first()
     if thread:
-        act = session.query(Action).filter(Action.user_id == current_user.id, Action.thread_id == id, Action.liked == True).first()
-        if not act:
+        act = session.query(Action).filter(Action.user_id == current_user.id, Action.thread_id == id).first()
+        if act != None:
+            if act.liked is None:
+                act.liked = True
+                thread.like_count = 1 + session.query(Thread).filter(Thread.id == id).first().like_count
+                session.commit()
+        else:
             action = Action()
             action.user_id = current_user.id
             action.thread_id = id
