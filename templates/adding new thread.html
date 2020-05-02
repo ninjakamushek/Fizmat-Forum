@@ -1,6 +1,8 @@
 {% extends "base.html" %}
 {% block content %}
+<a href="/" class="btn btn-secondary" style="color: #fff;margin-left: 20px;margin-top: 15px;">Назад</a>
 <h1 class="form">Создание Треда</h1>
+<br/>
 <form class="form" action="" method="post">
     {{ form.hidden_tag() }}
     {{ form.csrf_token }}

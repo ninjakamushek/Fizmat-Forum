@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 {% block content %}
-<br>
+<a href="/" class="btn btn-secondary" style="color: #fff;margin-left: 20px;margin-top: 15px;">Назад</a>
 <div class="form"><a href="/add_comment/{{thread.id}}"><h2 align="center">{{ thread.title }}</h2></a></div>
 <p align="center">нажмите чтобы оставить комментарий</p>
 <hr/>
 {% for comm in comments %}
 <div class="comment">
-    <p>{{ comm.user.name }} {{ comm.user.surname }}: "{{ comm.text }}"</p>
+    <p><a target="_blank" href="/profile/{{ comm.user_id }}">{{ comm.user.name }} {{ comm.user.surname }}</a>: "{{ comm.text }}"</p>
     {% if current_user.is_authenticated and current_user == comm.user %}
         <a href="/comment_edit/{{ comm.id }}" class="btn btn-warning">Изменить</a>
         <a href="/comment_delete/{{ comm.id }}" class="btn btn-danger">Удалить</a>

@@ -1,13 +1,14 @@
 {% extends "base.html" %}
 {% block content %}
+<a href="/thread/{{ comment.thread_id }}" class="btn btn-secondary" style="color: #fff;margin-left: 20px;margin-top: 15px;">Назад</a>
 <div class="comment">
-    <p>{{ comment.user.name }} {{ comment.user.surname }}: "{{ comment.text }}"</p>
+    <p><a target="_blank" href="/profile/{{ comment.user_id }}">{{ comment.user.name }} {{ comment.user.surname }}</a>: "{{ comment.text }}"</p>
     <a href="/add_answer/{{comment.id}}" class="btn btn-info">Ответить</a>
 </div>
 <hr/>
 {% for ans in answers %}
 <div class="comment">
-    <p>{{ ans.user.name }} {{ ans.user.surname }}: "{{ ans.text }}"</p>
+    <p><a target="_blank" href="/profile/{{ ans.user_id }}">{{ ans.user.name }} {{ ans.user.surname }}</a>: "{{ ans.text }}"</p>
 </div>
 {% endfor %}
 {% endblock %}

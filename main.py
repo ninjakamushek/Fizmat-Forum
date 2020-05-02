@@ -2,6 +2,7 @@ from flask import Flask, render_template, request
 from flask_login import login_user, LoginManager, login_required, logout_user, current_user
 from werkzeug.exceptions import abort
 from werkzeug.utils import redirect
+
 from AnswerForm import AnswerForm
 from CommentForm import CommentForm
 from LoginForm import LoginForm
@@ -31,15 +32,18 @@ def index():
     session = db_session.create_session()
     return render_template('index.html', threads=session.query(Thread).all())
 
+
 @app.route('/sorted')
 def sorted_index():
     session = db_session.create_session()
     if request.args.get('sort_type') == 'time':
         return render_template('index.html', threads=session.query(Thread).all())
     elif request.args.get('sort_type') == 'like':
-        return render_template('index.html', threads=sorted(session.query(Thread).all(), key=lambda x: x.like_count))
+        return render_template('index.html', threads=sorted(session.query(Thread).all(),
+                                                            key=lambda x: x.like_count))
     elif request.args.get('sort_type') == 'view':
-        return render_template('index.html', threads=sorted(session.query(Thread).all(), key=lambda x: x.view_count))
+        return render_template('index.html', threads=sorted(session.query(Thread).all(),
+                                                            key=lambda x: x.view_count))
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -59,6 +63,7 @@ def register():
         user.surname = form.surname.data
         user.name = form.name.data
         user.age = form.age.data
+        user.grade = form.grade.data
         user.email = form.email.data
         user.set_password(form.password.data)
         session.add(user)
@@ -113,11 +118,13 @@ def indexed_thread(tid):
     session = db_session.create_session()
     thread = session.query(Thread).filter(Thread.id == tid).first()
     if thread:
-        act = session.query(Action).filter(Action.user_id == current_user.id, Action.thread_id == tid).first()
+        act = session.query(Action).filter(Action.user_id == current_user.id,
+                                           Action.thread_id == tid).first()
         if act:
             if act.viewed is None:
                 act.viewed = True
-                thread.view_count = 1 + session.query(Thread).filter(Thread.id == tid).first().view_count
+                thread.view_count = 1 + session.query(Thread).filter(
+                    Thread.id == tid).first().view_count
                 session.commit()
         else:
             action = Action()
@@ -153,11 +160,13 @@ def like_thread(id):
     session = db_session.create_session()
     thread = session.query(Thread).filter(Thread.id == id).first()
     if thread:
-        act = session.query(Action).filter(Action.user_id == current_user.id, Action.thread_id == id).first()
-        if act != None:
+        act = session.query(Action).filter(Action.user_id == current_user.id,
+                                           Action.thread_id == id).first()
+        if act is not None:
             if act.liked is None:
                 act.liked = True
-                thread.like_count = 1 + session.query(Thread).filter(Thread.id == id).first().like_count
+                thread.like_count = 1 + session.query(Thread).filter(
+                    Thread.id == id).first().like_count
                 session.commit()
         else:
             action = Action()
@@ -174,18 +183,20 @@ def like_thread(id):
 @login_required
 def add_comment(tid):
     form = CommentForm()
+    session = db_session.create_session()
     if form.validate_on_submit():
-        session = db_session.create_session()
         comment = Comment()
         comment.text = form.text.data
         comment.user_id = current_user.id
         comment.thread_id = tid
         thread = session.query(Thread).filter(Thread.id == tid).first()
-        thread.comment_count = 1 + session.query(Thread).filter(Thread.id == tid).first().comment_count
+        thread.comment_count = 1 + session.query(Thread).filter(
+            Thread.id == tid).first().comment_count
         session.add(comment)
         session.commit()
         return redirect(f'/thread/{tid}')
-    return render_template('add_comment.html', title='Оставить комментарий', form=form)
+    return render_template('add_comment.html', title='Оставить комментарий', form=form,
+                           thread=session.query(Thread).filter(Thread.id == tid).first())
 
 
 @app.route('/comment_edit/<int:id>', methods=['GET', 'POST'])
@@ -222,7 +233,8 @@ def comment_delete(id):
     if comment:
         session.delete(comment)
         thread = session.query(Thread).filter(Thread.id == comment.thread_id).first()
-        thread.comment_count = session.query(Thread).filter(Thread.id == comment.thread_id).first().comment_count - 1
+        thread.comment_count = session.query(Thread).filter(
+            Thread.id == comment.thread_id).first().comment_count - 1
         session.commit()
     else:
         abort(404)
@@ -233,8 +245,8 @@ def comment_delete(id):
 @login_required
 def add_answer(cid):
     form = AnswerForm()
+    session = db_session.create_session()
     if form.validate_on_submit():
-        session = db_session.create_session()
         answer = Answer()
         answer.text = form.text.data
         answer.user_id = current_user.id
@@ -242,7 +254,8 @@ def add_answer(cid):
         session.add(answer)
         session.commit()
         return redirect(f'/answers/{answer.comm_id}')
-    return render_template('add_answer.html', title='Ответить на комментарий', form=form)
+    return render_template('add_answer.html', title='Ответить на комментарий', form=form,
+                           comment=session.query(Comment).filter(Comment.id == cid).first())
 
 
 @app.route('/answers/<cid>')
@@ -251,6 +264,12 @@ def answers(cid):
     return render_template('answers.html',
                            comment=session.query(Comment).filter(Comment.id == cid).first(),
                            answers=session.query(Answer).filter(Answer.comm_id == cid).all())
+
+
+@app.route('/profile/<uid>')
+def profile(uid):
+    session = db_session.create_session()
+    return render_template('profile.html', user=session.query(User).filter(User.id == uid).first())
 
 
 def main():

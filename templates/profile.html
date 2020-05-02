@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+<br/>
+<h2 align="left" style="margin-left: 30px;">Профиль пользователя {{ user.name }} {{ user.surname }} (#{{ user.id }})</h2>
+<hr/>
+<div class="profile">
+    <h5>Возраст: {{ user.age }}</h5>
+    <h5>Класс: {{ user.grade }}</h5>
+    <h5>Эл.почта: {{ user.email }}</h5>
+    <br/>
+    <a class="btn btn-primary" style="color: #fff;">Изменить информацию о себе</a>
+</div>
+
+{% endblock %}
