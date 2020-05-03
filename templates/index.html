@@ -1,12 +1,14 @@
 {% extends "base.html" %}
 {% block select %}
-<form name="sort_type" action="/sorted" method="GET">
-    <select name="sort_type">
-        <option value="time">Сортировать по новизне</option>
-        <option value="like">Сортировать по количеству лайков</option>
-        <option value="view">Сортировать по количеству просмотров</option>
-    </select>
-<input type="submit" value="Сортировать">
+<form class="form-inline" name="sort_type" action="/sorted" method="GET">
+    <div class="form-group mx-sm-3">
+        <select class="form-control" name="sort_type">
+            <option value="time">Сортировать по новизне</option>
+            <option value="like">Сортировать по количеству лайков</option>
+            <option value="view">Сортировать по количеству просмотров</option>
+        </select>
+    </div>
+    <button class="btn btn-info" type="submit">Сортировать</button>
 </form>
 {% endblock %}
 

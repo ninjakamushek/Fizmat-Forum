@@ -17,7 +17,7 @@
                 {% block select %}{% endblock %}
                 {% if current_user.is_authenticated %}
                     <span>
-                        <a class="navbar-brand" href="/profile/{{current_user.id}}">{{ current_user.name }} {{ current_user.surname }}</a>
+                        <a target="_blank" class="navbar-brand" href="/profile/{{current_user.id}}">{{ current_user.name }} {{ current_user.surname }}</a>
                         <a class="btn btn-light" href="/logout">Выйти</a>
                     </span>
                 {% else %}
