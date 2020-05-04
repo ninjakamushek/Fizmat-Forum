@@ -211,25 +211,24 @@ def add_comment(tid):
 @login_required
 def comment_edit(id):
     form = CommentForm()
+    session = db_session.create_session()
+    comment = session.query(Comment).filter(Comment.id == id,
+                                            Comment.user == current_user).first()
     if request.method == "GET":
-        session = db_session.create_session()
-        comment = session.query(Comment).filter(Comment.id == id,
-                                                Comment.user == current_user).first()
         if comment:
             form.text.data = comment.text
         else:
             abort(404)
     if form.validate_on_submit():
-        session = db_session.create_session()
-        comment = session.query(Comment).filter(Comment.id == id,
-                                                Comment.user == current_user).first()
         if comment:
             comment.text = form.text.data
             session.commit()
             return redirect(f'/thread/{comment.thread_id}')
         else:
             abort(404)
-    return render_template('add_comment.html', title='Редактирование комментария', form=form)
+    return render_template('add_comment.html', title='Редактирование комментария', form=form,
+                           thread=session.query(Thread).filter(
+                               Thread.id == comment.thread_id).first())
 
 
 @app.route('/comment_delete/<int:id>', methods=['GET', 'POST'])

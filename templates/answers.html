@@ -3,7 +3,7 @@
 <a href="/thread/{{ comment.thread_id }}" class="btn btn-secondary" style="color: #fff;margin-left: 20px;margin-top: 15px;">Назад</a>
 <div class="comment">
     <p><a target="_blank" href="/profile/{{ comment.user_id }}">{{ comment.user.name }} {{ comment.user.surname }}</a>: "{{ comment.text }}"</p>
-    <a href="/add_answer/{{comment.id}}" class="btn btn-info">Ответить</a>
+    <a href="/add_answer/{{ comment.id }}" class="btn btn-info">Ответить</a>
 </div>
 <hr/>
 {% for ans in answers %}
