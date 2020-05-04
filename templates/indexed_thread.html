@@ -8,10 +8,10 @@
 <div class="comment">
     <p><a target="_blank" href="/profile/{{ comm.user_id }}">{{ comm.user.name }} {{ comm.user.surname }}</a>: "{{ comm.text }}"</p>
     {% if current_user.is_authenticated and current_user == comm.user %}
-        <a href="/comment_edit/{{ comm.id }}" class="btn btn-warning">Изменить</a>
-        <a href="/comment_delete/{{ comm.id }}" class="btn btn-danger">Удалить</a>
+        <a href="/comment_edit/{{ comm.id }}" class="btn btn-warning" style="color: #fff;">Изменить</a>
+        <a href="/comment_delete/{{ comm.id }}" class="btn btn-danger" style="color: #fff;">Удалить</a>
     {% endif %}
-    <a href="/answers/{{comm.id}}" class="btn btn-info">Посмотреть ответы</a>
+    <a href="/answers/{{comm.id}}" class="btn btn-info" style="color: #fff;">Посмотреть ответы</a>
 </div>
 {% endfor %}
 {% endblock %}

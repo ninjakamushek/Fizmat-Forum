@@ -17,10 +17,22 @@
 <br/><br/>
 {% for item in threads|reverse %}
     <div class="thread">
-        <a href="/thread/{{ item.id }}"><h5>{{ item.title }}</h5></a>
-        <p>нравится {{ item.like_count }} комментариев {{ item.comment_count }} просмотров {{ item.view_count }}</p>
+        <a href="/thread/{{ item.id }}"><h4>{{ item.title }}</h4></a>
+        <p>Автор: <a target="_blank" href="/profile/{{current_user.id}}">{{ item.user.name }} {{ item.user.surname }}</a> |
+        {% for tag in item.categories %}
+            {% if tag.name == "education" %}
+                <a class="btn btn-info" style="color: #fff;">#education</a>
+            {% elif tag.name == "akr" %}
+                <a class="btn btn-primary" style="color: #fff;">#akr</a>
+            {% elif tag.name == "olympiads" %}
+                <a class="btn btn-success" style="color: #fff;">#olympiads</a>
+            {% else %}
+                <a class="btn btn-warning" style="color: #fff;">#else</a>
+            {% endif %}
+        {% endfor %}
+        <br/>нравится {{ item.like_count }} комментариев {{ item.comment_count }} просмотров {{ item.view_count }}</p>
         {% if current_user.is_authenticated and current_user == item.user %}
-                <a href="/thread_delete/{{ item.id }}" class="btn btn-danger">Удалить</a>
+            <a href="/thread_delete/{{ item.id }}" class="btn btn-danger">Удалить</a>
         {% endif %}
         {% if current_user.is_authenticated %}
             <a href="/like_thread/{{ item.id }}"><img src="/static/img/like.png" height="20px" width="20px" align="right"></a>

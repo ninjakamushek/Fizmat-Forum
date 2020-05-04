@@ -2,7 +2,6 @@ from flask import Flask, render_template, request
 from flask_login import login_user, LoginManager, login_required, logout_user, current_user
 from werkzeug.exceptions import abort
 from werkzeug.utils import redirect
-from wtforms import SubmitField
 
 from AnswerForm import AnswerForm
 from CommentForm import CommentForm
@@ -115,8 +114,7 @@ def add_thread():
         session.add(thread)
         session.commit()
         return redirect('/')
-    return render_template('adding new thread.html', title='Создание треда',
-                           form=form)
+    return render_template('adding new thread.html', title='Создание треда', form=form)
 
 
 @app.route('/thread/<tid>')
