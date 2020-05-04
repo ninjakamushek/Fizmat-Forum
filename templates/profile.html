@@ -8,7 +8,9 @@
     <h5>Класс: {{ user.grade }}</h5>
     <h5>Эл.почта: {{ user.email }}</h5>
     <br/>
-    <a class="btn btn-primary" style="color: #fff;">Изменить информацию о себе</a>
+    {% if current_user.is_authenticated and current_user == user %}
+        <a href="/update_profile/{{ user.id }}" class="btn btn-primary" style="color: #fff;">Изменить информацию о себе</a>
+    {% endif %}
 </div>
 
 {% endblock %}

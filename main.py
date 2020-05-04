@@ -2,12 +2,14 @@ from flask import Flask, render_template, request
 from flask_login import login_user, LoginManager, login_required, logout_user, current_user
 from werkzeug.exceptions import abort
 from werkzeug.utils import redirect
+from wtforms import SubmitField
 
 from AnswerForm import AnswerForm
 from CommentForm import CommentForm
 from LoginForm import LoginForm
 from RegisterForm import RegisterForm
 from ThreadForm import ThreadForm
+from UpdateForm import UpdateForm
 from data import db_session
 from data.answers import Answer
 from data.comments import Comment
@@ -55,13 +57,11 @@ def register():
     if form.validate_on_submit():
         if form.password.data != form.password_again.data:
             return render_template('registration.html', title='Регистрация',
-                                   form=form,
-                                   message="Пароли не совпадают")
+                                   form=form, message="Пароли не совпадают")
         session = db_session.create_session()
         if session.query(User).filter(User.email == form.email.data).first():
             return render_template('registration.html', title='Регистрация',
-                                   form=form,
-                                   message="Такой пользователь уже есть")
+                                   form=form, message="Такой пользователь уже есть")
         user = User()
         user.surname = form.surname.data
         user.name = form.name.data
@@ -120,7 +120,7 @@ def add_thread():
 def indexed_thread(tid):
     session = db_session.create_session()
     thread = session.query(Thread).filter(Thread.id == tid).first()
-    if thread:
+    if thread and current_user.is_authenticated:
         act = session.query(Action).filter(Action.user_id == current_user.id,
                                            Action.thread_id == tid).first()
         if act:
@@ -149,6 +149,11 @@ def thread_delete(id):
     thread = session.query(Thread).filter(Thread.id == id, Thread.user == current_user).first()
     if thread:
         session.delete(thread)
+        coms = session.query(Comment).filter(Comment.thread_id == id).all()
+        for com in coms:
+            for ans in session.query(Answer).filter(Answer.comm_id == com.id).all():
+                session.delete(ans)
+            session.delete(com)
         for act in session.query(Action).filter(Action.thread_id == id):
             session.delete(act)
         session.commit()
@@ -235,6 +240,8 @@ def comment_delete(id):
                                             Comment.user == current_user).first()
     if comment:
         session.delete(comment)
+        for ans in session.query(Answer).filter(Answer.comm_id == comment.id).all():
+            session.delete(ans)
         thread = session.query(Thread).filter(Thread.id == comment.thread_id).first()
         thread.comment_count = session.query(Thread).filter(
             Thread.id == comment.thread_id).first().comment_count - 1
@@ -272,7 +279,28 @@ def answers(cid):
 @app.route('/profile/<uid>')
 def profile(uid):
     session = db_session.create_session()
-    return render_template('profile.html', user=session.query(User).filter(User.id == uid).first())
+    return render_template('profile.html', user=session.query(User).filter(User.id == uid).first(),
+                           current_user=current_user)
+
+
+@app.route('/update_profile/<uid>', methods=['GET', 'POST'])
+@login_required
+def update_profile(uid):
+    form = UpdateForm()
+    if form.validate_on_submit():
+        if form.password.data != form.password_again.data:
+            return render_template('update.html', title='Изменение профиля',
+                                   form=form, message="Пароли не совпадают")
+        session = db_session.create_session()
+        current_user.surname = form.surname.data
+        current_user.name = form.name.data
+        current_user.age = form.age.data
+        current_user.grade = form.grade.data
+        current_user.set_password(form.password.data)
+        session.merge(current_user)
+        session.commit()
+        return redirect(f'/profile/{uid}')
+    return render_template('update.html', title='Изменение профиля', form=form)
 
 
 def main():
