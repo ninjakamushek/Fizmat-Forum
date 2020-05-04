@@ -44,6 +44,9 @@ def sorted_index():
     elif request.args.get('sort_type') == 'view':
         return render_template('index.html', threads=sorted(session.query(Thread).all(),
                                                             key=lambda x: x.view_count))
+    elif request.args.get('sort_type') == 'comment':
+        return render_template('index.html', threads=sorted(session.query(Thread).all(),
+                                                            key=lambda x: x.comment_count))
 
 
 @app.route('/register', methods=['GET', 'POST'])
