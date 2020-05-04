@@ -12,6 +12,7 @@ from ThreadForm import ThreadForm
 from UpdateForm import UpdateForm
 from data import db_session
 from data.answers import Answer
+from data.categories import Category
 from data.comments import Comment
 from data.statistics import Action
 from data.threads import Thread
@@ -109,6 +110,8 @@ def add_thread():
         thread.like_count = 0
         thread.view_count = 0
         thread.comment_count = 0
+        for tag in form.tags.data:
+            thread.categories.append(session.query(Category).filter(Category.name == tag).first())
         session.add(thread)
         session.commit()
         return redirect('/')
