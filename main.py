@@ -2,7 +2,9 @@ from flask import Flask, render_template, request
 from flask_login import login_user, LoginManager, login_required, logout_user, current_user
 from werkzeug.exceptions import abort
 from werkzeug.utils import redirect
+from flask_restful import reqparse, abort, Api, Resource
 
+import threads_resources
 from AnswerForm import AnswerForm
 from CommentForm import CommentForm
 from LoginForm import LoginForm
@@ -18,9 +20,12 @@ from data.threads import Thread
 from data.users import User
 
 app = Flask(__name__)
+api = Api(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
 app.config['SECRET_KEY'] = 'ff_secret_key'
+api.add_resource(threads_resources.ThreadListResource, '/api/threads')
+api.add_resource(threads_resources.ThreadResource, '/api/threads/<int:thread_id>')
 
 
 @login_manager.user_loader
