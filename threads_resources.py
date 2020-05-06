@@ -2,6 +2,9 @@ from flask import jsonify
 from flask_restful import abort, Resource, reqparse
 
 from data import db_session
+from data.answers import Answer
+from data.comments import Comment
+from data.statistics import Action
 from data.threads import Thread
 from data.users import User
 
@@ -38,6 +41,13 @@ class ThreadResource(Resource):
         user = session.query(User).filter(User.id == args['user_id']).first()
         if user.check_password(args['password']):
             session.delete(thread)
+            coms = session.query(Comment).filter(Comment.thread_id == id).all()
+            for com in coms:
+                for ans in session.query(Answer).filter(Answer.comm_id == com.id).all():
+                    session.delete(ans)
+                session.delete(com)
+            for act in session.query(Action).filter(Action.thread_id == id):
+                session.delete(act)
             session.commit()
             return jsonify({'success': 'OK'})
 
