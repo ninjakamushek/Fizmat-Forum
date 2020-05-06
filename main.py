@@ -40,6 +40,16 @@ def index():
     return render_template('index.html', threads=session.query(Thread).all())
 
 
+@app.route('/tagged_threads/<tag>')
+def tagged_threads(tag):
+    session = db_session.create_session()
+    threads = []
+    for thread in session.query(Thread).all():
+        if tag in list(map(lambda x: x.name, thread.categories)):
+            threads.append(thread)
+    return render_template('tagged_threads.html', threads=threads)
+
+
 @app.route('/sorted')
 def sorted_index():
     session = db_session.create_session()
