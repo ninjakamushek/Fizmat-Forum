@@ -36,9 +36,21 @@ def load_user(user_id):
     return session.query(User).get(user_id)
 
 
+def check_like(likeslist, thread):
+    for i in likeslist:
+        if i.thread_id == thread.id:
+            return True
+    return False
+
+
 @app.route('/')
 def index():
     session = db_session.create_session()
+    if current_user.is_authenticated:
+        return render_template('index.html', threads=session.query(Thread).all(),
+                           likes=session.query(Action).filter(Action.liked,
+                                                              Action.user_id == current_user.id).all(),
+                           func=check_like)
     return render_template('index.html', threads=session.query(Thread).all())
 
 
@@ -341,7 +353,8 @@ def run_local_remote_available():
 
 def main():
     db_session.global_init("db/FF.sqlite")
-    run_local_remote_available()
+    # run_local_remote_available()
+    app.run()
 
 
 if __name__ == '__main__':
