@@ -1,8 +1,8 @@
 from flask import Flask, render_template, request
 from flask_login import login_user, LoginManager, login_required, logout_user, current_user
+from flask_restful import abort, Api
 from werkzeug.exceptions import abort
 from werkzeug.utils import redirect
-from flask_restful import reqparse, abort, Api, Resource
 
 import threads_resources
 from AnswerForm import AnswerForm
@@ -73,6 +73,20 @@ def register():
         if form.password.data != form.password_again.data:
             return render_template('registration.html', title='Регистрация',
                                    form=form, message="Пароли не совпадают")
+        if len(form.password.data) < 8:
+            return render_template('registration.html', title='Регистрация',
+                                   form=form, message="Пароль не может быть короче 8 символов")
+        if form.password.data.isalpha():
+            return render_template('registration.html', title='Регистрация',
+                                   form=form, message="Пароль должен содержать хотя бы одну цифру")
+        if form.password.data.isdigit():
+            return render_template('registration.html', title='Регистрация',
+                                   form=form, message="Пароль должен содержать хотя бы одну букву")
+        if form.password.data.isalnum():
+            return render_template('registration.html', title='Регистрация',
+                                   form=form,
+                                   message="Пароль должен содержать хотя бы один символ отличный от "
+                                           "букв и цифр")
         session = db_session.create_session()
         if session.query(User).filter(User.email == form.email.data).first():
             return render_template('registration.html', title='Регистрация',
