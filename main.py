@@ -1,3 +1,5 @@
+import os
+
 from flask import Flask, render_template, request
 from flask_login import login_user, LoginManager, login_required, logout_user, current_user
 from flask_restful import abort, Api
@@ -332,9 +334,14 @@ def update_profile(uid):
     return render_template('update.html', title='Изменение профиля', form=form)
 
 
+def run_local_remote_available():
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)
+
+
 def main():
     db_session.global_init("db/FF.sqlite")
-    app.run()
+    run_local_remote_available()
 
 
 if __name__ == '__main__':
