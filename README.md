@@ -1,7 +1,7 @@
 # Fizmat-Forum
 
 ## Description
-Fizmat Forum is a comfortable place for all Fizmat students where you can ask any question and discuss different topics.  
+Fizmat Forum is a comfortable place for all [Fizmat](https://fizmat.kz) students where you can ask any question and discuss different topics.  
 This app is in russian.
 
 You can look for threads on different subjects, like them, and search for answers in comments section.
