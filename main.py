@@ -215,11 +215,15 @@ def like_thread(id):
         act = session.query(Action).filter(Action.user_id == current_user.id,
                                            Action.thread_id == id).first()
         if act is not None:
-            if act.liked is None:
+            if not act.liked:
                 act.liked = True
                 thread.like_count = 1 + session.query(Thread).filter(
                     Thread.id == id).first().like_count
-                session.commit()
+            else:
+                act.liked = False
+                thread.like_count = session.query(Thread).filter(
+                    Thread.id == id).first().like_count - 1
+            session.commit()
         else:
             action = Action()
             action.user_id = current_user.id
@@ -348,12 +352,13 @@ def update_profile(uid):
 
 def run_local_remote_available():
     port = int(os.environ.get("PORT", 5000))
-    app.run(host='0.0.0.0', port=port)
+    app.run(host="0.0.0.0", port=port)
 
 
 def main():
     db_session.global_init("db/FF.sqlite")
     run_local_remote_available()
+
 
 
 if __name__ == '__main__':
