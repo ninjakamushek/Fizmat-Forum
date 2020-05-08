@@ -357,8 +357,7 @@ def run_local_remote_available():
 
 def main():
     db_session.global_init("db/FF.sqlite")
-    # run_local_remote_available()
-    app.run()
+    run_local_remote_available()
 
 
 if __name__ == '__main__':
