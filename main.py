@@ -48,9 +48,10 @@ def index():
     session = db_session.create_session()
     if current_user.is_authenticated:
         return render_template('index.html', threads=session.query(Thread).all(),
-                           likes=session.query(Action).filter(Action.liked,
-                                                              Action.user_id == current_user.id).all(),
-                           func=check_like)
+                               likes=session.query(Action).filter(Action.liked,
+                                                                  Action.user_id ==
+                                                                  current_user.id).all(),
+                               func=check_like)
     return render_template('index.html', threads=session.query(Thread).all())
 
 
@@ -61,21 +62,51 @@ def tagged_threads(tag):
     for thread in session.query(Thread).all():
         if tag in list(map(lambda x: x.name, thread.categories)):
             threads.append(thread)
-    return render_template('tagged_threads.html', threads=threads)
+    return render_template('tagged_threads.html', threads=threads, func=check_like,
+                           likes=session.query(Action).filter(Action.liked,
+                                                              Action.user_id ==
+                                                              current_user.id).all())
 
 
 @app.route('/sorted')
 def sorted_index():
     session = db_session.create_session()
     if request.args.get('sort_type') == 'time':
+        if current_user.is_authenticated:
+            return render_template('index.html', threads=session.query(Thread).all(),
+                                   func=check_like,
+                                   likes=session.query(Action).filter(Action.liked,
+                                                                      Action.user_id ==
+                                                                      current_user.id).all())
         return render_template('index.html', threads=session.query(Thread).all())
     elif request.args.get('sort_type') == 'like':
+        if current_user.is_authenticated:
+            return render_template('index.html', threads=sorted(session.query(Thread).all(),
+                                                                key=lambda x: x.like_count),
+                                   func=check_like,
+                                   likes=session.query(Action).filter(Action.liked,
+                                                                      Action.user_id ==
+                                                                      current_user.id).all())
         return render_template('index.html', threads=sorted(session.query(Thread).all(),
                                                             key=lambda x: x.like_count))
     elif request.args.get('sort_type') == 'view':
+        if current_user.is_authenticated:
+            return render_template('index.html', threads=sorted(session.query(Thread).all(),
+                                                                key=lambda x: x.view_count),
+                                   func=check_like,
+                                   likes=session.query(Action).filter(Action.liked,
+                                                                      Action.user_id ==
+                                                                      current_user.id).all())
         return render_template('index.html', threads=sorted(session.query(Thread).all(),
                                                             key=lambda x: x.view_count))
     elif request.args.get('sort_type') == 'comment':
+        if current_user.is_authenticated:
+            return render_template('index.html', threads=sorted(session.query(Thread).all(),
+                                                                key=lambda x: x.comment_count),
+                                   func=check_like,
+                                   likes=session.query(Action).filter(Action.liked,
+                                                                      Action.user_id ==
+                                                                      current_user.id).all())
         return render_template('index.html', threads=sorted(session.query(Thread).all(),
                                                             key=lambda x: x.comment_count))
 
