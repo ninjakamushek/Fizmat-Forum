@@ -18,7 +18,7 @@
 {% for item in threads|reverse %}
     <div class="thread">
         <a href="/thread/{{ item.id }}"><h4>{{ item.title }}</h4></a>
-        <p>Автор: <a target="_blank" href="/profile/{{current_user.id}}">{{ item.user.name }} {{ item.user.surname }}</a> |
+        <p>Автор: <a target="_blank" href="/profile/{{ item.user_id }}">{{ item.user.name }} {{ item.user.surname }}</a> |
         {% for tag in item.categories %}
             {% if tag.name == "education" %}
                 <a href="/tagged_threads/education" class="btn btn-info" style="color: #fff;">#education</a>

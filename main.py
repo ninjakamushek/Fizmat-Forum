@@ -62,10 +62,12 @@ def tagged_threads(tag):
     for thread in session.query(Thread).all():
         if tag in list(map(lambda x: x.name, thread.categories)):
             threads.append(thread)
-    return render_template('tagged_threads.html', threads=threads, func=check_like,
-                           likes=session.query(Action).filter(Action.liked,
-                                                              Action.user_id ==
-                                                              current_user.id).all())
+    if current_user.is_authenticated:
+        return render_template('tagged_threads.html', threads=threads, func=check_like,
+                               likes=session.query(Action).filter(Action.liked,
+                                                                  Action.user_id ==
+                                                                  current_user.id).all())
+    return render_template('index.html', threads=session.query(Thread).all())
 
 
 @app.route('/sorted')
